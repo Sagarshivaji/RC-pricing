@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>HireIQ &middot; Complete Platform | Multi-JD Pricing Workshop</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --brand-action: #EE8B26;
+      --brand-action-hover: #D97717;
+      --brand-ink: #13243A;
+      --brand-panel: #FFFFFF;
+      --brand-muted: #5E6F8D;
+      --brand-border: #E5ECF5;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F5F7FB;
+      color: var(--brand-ink);
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* Main layout with sidebar */
+    .app-layout {
+      display: flex;
+      height: 100vh;
+      width: 100%;
+      overflow: hidden;
+    }
+
+    /* ========= SIDEBAR ========= */
+    .sidebar {
+      width: 280px;
+      background: #0F223D;
+      backdrop-filter: blur(2px);
+      border-right: 1px solid rgba(255,255,255,0.08);
+      padding: 28px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+      box-shadow: 2px 0 12px rgba(0,0,0,0.02);
+      z-index: 5;
+      flex-shrink: 0;
+    }
+    .logo-area {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 1.4rem;
+      letter-spacing: -0.3px;
+      color: #FFFFFF;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+    }
+    .logo-icon {
+      background: var(--brand-action);
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 700;
+    }
+    .nav-side {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 500;
+      font-size: 0.9rem;
+      color: #D5DEEA;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .nav-item:hover {
+      background: rgba(255,255,255,0.08);
+      color: #FFFFFF;
+      transform: translateX(2px);
+    }
+    .nav-item.active-side {
+      background: rgba(238,139,38,0.16);
+      color: #FFFFFF;
+      box-shadow: inset 3px 0 0 var(--brand-action);
+    }
+    .nav-icon,
+    .inline-icon,
+    .heading-icon {
+      width: 1.1em;
+      height: 1.1em;
+      stroke-width: 2.25;
+      flex: 0 0 auto;
+    }
+    .nav-icon {
+      color: currentColor;
+    }
+    .inline-icon {
+      margin-right: 8px;
+      vertical-align: -0.18em;
+    }
+    .icon-heading {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .btn-primary,
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .bottom-side {
+      margin-top: auto;
+      border-top: 1px solid rgba(255,255,255,0.12);
+      padding-top: 24px;
+    }
+
+    /* Main content area */
+    .main-content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px 32px 32px 32px;
+      scroll-behavior: smooth;
+    }
+
+    /* View containers */
+    .view {
+      display: none;
+      animation: fadeInUp 0.3s ease-out;
+    }
+    .view.active-view {
+      display: block;
+    }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(8px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+
+    /* Card styles */
+    .card {
+      background: var(--brand-panel);
+      border-radius: 8px;
+      box-shadow: 0 10px 26px rgba(15,34,61,0.06), 0 1px 3px rgba(15,34,61,0.06);
+      padding: 28px;
+      border: 1px solid var(--brand-border);
+    }
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+    .insight-card-mini {
+      background: #F9FAFE;
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .btn-primary {
+      background: var(--brand-action);
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.9rem;
+    }
+    .btn-primary:hover {
+      background: var(--brand-action-hover);
+      transform: translateY(-1px);
+    }
+    .btn-secondary {
+      background: white;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .mt-4 { margin-top: 16px; }
+    .flex-between { display: flex; justify-content: space-between; align-items: center; }
+
+    /* Iframe styling for external app pages */
+    .embedded-page-frame,
+    .pricing-iframe-container {
+      width: 100%;
+      height: calc(100vh - 120px);
+      border: none;
+      border-radius: 8px;
+      background: white;
+      box-shadow: 0 10px 26px rgba(15,34,61,0.06), 0 1px 3px rgba(15,34,61,0.06);
+    }
+
+    @media (max-width: 900px) {
+      .sidebar { width: 80px; padding: 20px 12px; }
+      .sidebar .logo-area span:last-child, .sidebar .nav-label { display: none; }
+      .main-content { padding: 16px; }
+      .grid-2col { grid-template-columns: 1fr; }
+      .embedded-page-frame,
+      .pricing-iframe-container { height: calc(100vh - 100px); }
+    }
+  </style>
+</head>
+<body>
+<div class="app-layout">
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="logo-area">
+      <div class="logo-icon">HI</div>
+      <span>HireIQ</span>
+    </div>
+    <div class="nav-side">
+      <div class="nav-item active-side" data-view="dashboard">
+        <i data-lucide="layout-dashboard" class="nav-icon" aria-hidden="true"></i> <span class="nav-label">Dashboard</span>
+      </div>
+      <div class="nav-item" data-view="pricing">
+        <i data-lucide="circle-dollar-sign" class="nav-icon" aria-hidden="true"></i> <span class="nav-label">Pricing Workshop</span>
+      </div>
+      <div class="nav-item" data-view="reports">
+        <i data-lucide="chart-line" class="nav-icon" aria-hidden="true"></i> <span class="nav-label">Reports</span>
+      </div>
+      <div class="nav-item" data-view="settings">
+        <i data-lucide="settings" class="nav-icon" aria-hidden="true"></i> <span class="nav-label">Settings</span>
+      </div>
+    </div>
+    <div class="bottom-side">
+      <div class="nav-item" style="opacity:0.7;">
+        <i data-lucide="users" class="nav-icon" aria-hidden="true"></i> <span class="nav-label">Recruiter Team</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main-content">
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="view active-view">
+      <iframe id="dashboardFrame" class="embedded-page-frame" src="dashboard.html" title="RC Pricing Dashboard"></iframe>
+    </div>
+
+    <!-- PRICING WORKSHOP VIEW - Now loads external pricing-flow.html in iframe -->
+    <div id="pricingView" class="view">
+      <div style="margin-bottom: 20px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+          <div>
+            <h1 style="font-size: 1.6rem; font-weight: 600;"><i data-lucide="circle-dollar-sign" class="inline-icon" aria-hidden="true"></i> Pricing Workshop</h1>
+            <p style="color: #5E6F8D;">AI-powered rate intelligence & job pricing simulation</p>
+          </div>
+          <button id="refreshPricingFrame" class="btn-secondary" style="padding: 8px 16px;"><i data-lucide="refresh-cw" class="inline-icon" aria-hidden="true"></i> Refresh</button>
+        </div>
+      </div>
+      <iframe id="pricingFlowFrame" class="pricing-iframe-container" src="pricing flow.html" title="Pricing Workshop Flow"></iframe>
+    </div>
+
+    <!-- REPORTS VIEW -->
+    <div id="reportsView" class="view">
+      <div class="card">
+        <h2 class="icon-heading"><i data-lucide="bar-chart-3" class="heading-icon" aria-hidden="true"></i> Recruitment Analytics</h2>
+        <div class="grid-2col">
+          <div><div class="insight-card-mini"><strong>Time-to-hire</strong><br>Avg 34 days <span style="color:#2B6E3C;">Down 12%</span></div></div>
+          <div><div class="insight-card-mini"><strong>Offer acceptance rate</strong><br>86% across Q4</div></div>
+        </div>
+        <div class="mt-4"><button class="btn-primary" id="exportReportBtn">Export Full Report (CSV)</button></div>
+      </div>
+    </div>
+
+    <!-- SETTINGS VIEW -->
+    <div id="settingsView" class="view">
+      <div class="card">
+        <h2 class="icon-heading"><i data-lucide="settings" class="heading-icon" aria-hidden="true"></i> Platform Settings</h2>
+        <div class="grid-2col">
+          <div><div class="insight-card-mini"><strong><i data-lucide="bell" class="inline-icon" aria-hidden="true"></i> Notifications</strong><br><label><input type="checkbox" checked> AI candidate alerts</label><br><label><input type="checkbox"> Weekly digest</label></div></div>
+          <div><div class="insight-card-mini"><strong><i data-lucide="lock-keyhole" class="inline-icon" aria-hidden="true"></i> Integrations</strong><br>Greenhouse &middot; Lever &middot; Slack connected</div></div>
+        </div>
+        <div class="mt-4"><button class="btn-secondary" id="saveSettingsBtn">Save Preferences</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Sidebar navigation
+  const navItems = document.querySelectorAll('.nav-item');
+  const views = {
+    dashboard: document.getElementById('dashboardView'),
+    pricing: document.getElementById('pricingView'),
+    reports: document.getElementById('reportsView'),
+    settings: document.getElementById('settingsView')
+  };
+
+  // Track if iframe has been loaded
+  let iframeLoaded = false;
+
+  function switchView(viewName) {
+    Object.keys(views).forEach(key => {
+      views[key].classList.remove('active-view');
+    });
+    views[viewName].classList.add('active-view');
+    
+    navItems.forEach(item => {
+      const itemView = item.getAttribute('data-view');
+      if (itemView === viewName) {
+        item.classList.add('active-side');
+      } else {
+        item.classList.remove('active-side');
+      }
+    });
+
+    // If switching to pricing view and iframe not yet loaded, ensure it loads
+    if (viewName === 'pricing') {
+      const iframe = document.getElementById('pricingFlowFrame');
+      if (iframe && !iframeLoaded) {
+        // iframe already has src, just mark as loaded after it loads
+        iframe.onload = function() {
+          iframeLoaded = true;
+        };
+      }
+    }
+  }
+
+  navItems.forEach(item => {
+    item.addEventListener('click', () => {
+      const viewName = item.getAttribute('data-view');
+      switchView(viewName);
+    });
+  });
+
+  document.getElementById('goToPricingFromDashboard')?.addEventListener('click', () => {
+    switchView('pricing');
+  });
+
+  document.getElementById('exportReportBtn')?.addEventListener('click', () => {
+    alert("Report export: Full analytics CSV would be generated here.");
+  });
+
+  document.getElementById('saveSettingsBtn')?.addEventListener('click', () => {
+    alert("Settings saved successfully!");
+  });
+
+  // Refresh iframe button
+  document.getElementById('refreshPricingFrame')?.addEventListener('click', () => {
+    const iframe = document.getElementById('pricingFlowFrame');
+    if (iframe) {
+      iframe.src = iframe.src;
+      showToast("Pricing Workshop refreshed");
+    }
+  });
+
+  // Handle iframe load errors - show helpful message if pricing-flow.html doesn't exist
+  const iframe = document.getElementById('pricingFlowFrame');
+  if (iframe) {
+    iframe.onerror = function() {
+      showToast("pricing-flow.html not found. Please ensure the file exists in the same directory.", 4000);
+    };
+    // Try to detect iframe load failure via timeout (alternative)
+    setTimeout(() => {
+      try {
+        // Check if iframe content is accessible (won't work cross-origin but we can check existence)
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+        // If we can't access and it's been 2 seconds, might be fine - just a note
+      } catch(e) {
+        // Cross-origin is expected, ignore
+      }
+    }, 2000);
+  }
+
+  function showToast(msg, duration = 2500) {
+    const toast = document.createElement('div');
+    toast.innerText = msg;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '30px';
+    toast.style.right = '30px';
+    toast.style.backgroundColor = '#1F2A44';
+    toast.style.color = 'white';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '40px';
+    toast.style.fontSize = '0.85rem';
+    toast.style.zIndex = '2000';
+    toast.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), duration);
+  }
+
+  // Initialize - ensure dashboard is active
+  if (window.lucide) {
+    lucide.createIcons();
+  }
+  console.log("HireIQ Platform ready. Pricing Workshop loads pricing-flow.html in iframe.");
+</script>
+</body>
+</html>

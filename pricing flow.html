@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>HireIQ &middot; Multi-File Upload | Batch JD Analysis</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --brand-action: #EE8B26;
+      --brand-action-hover: #D97717;
+      --brand-ink: #13243A;
+      --brand-muted: #5E6F8D;
+      --brand-border: #E5ECF5;
+      --brand-soft: #FFF4E8;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #F5F7FB;
+      color: var(--brand-ink);
+      line-height: 1.4;
+    }
+
+    .app-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 36px 48px 36px;
+    }
+
+    .header {
+      margin-bottom: 28px;
+    }
+    .header h1 {
+      font-size: 1.9rem;
+      font-weight: 600;
+      letter-spacing: -0.3px;
+      color: var(--brand-ink);
+    }
+    .header p {
+      color: #5E6F8D;
+      margin-top: 6px;
+    }
+
+    /* stage stepper */
+    .stage-stepper {
+      display: flex;
+      gap: 8px;
+      background: white;
+      padding: 8px 16px;
+      border-radius: 12px;
+      width: fit-content;
+      margin-bottom: 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+    .stage {
+      padding: 8px 20px;
+      border-radius: 10px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      background: #F0F4FA;
+      color: #4A5B7A;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .stage.active-stage {
+      background: var(--brand-action);
+      color: white;
+      box-shadow: 0 6px 14px rgba(238,139,38,0.24);
+    }
+    .stage.completed {
+      background: var(--brand-soft);
+      color: #8A4E12;
+    }
+
+    /* main workflow grid */
+    .workflow-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 28px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 10px 26px rgba(15,34,61,0.06), 0 1px 3px rgba(15,34,61,0.06);
+      padding: 28px;
+      border: 1px solid var(--brand-border);
+      transition: all 0.2s;
+    }
+
+    /* Multi Upload Area */
+    .multi-upload-area {
+      border: 2px dashed #CFDFF0;
+      background: #FCFDFF;
+      border-radius: 8px;
+      padding: 40px 24px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 24px;
+    }
+    .multi-upload-area:hover {
+      border-color: var(--brand-action);
+      background: #FFF9F2;
+    }
+    .upload-icon {
+      color: var(--brand-action);
+      margin-bottom: 12px;
+    }
+    .upload-icon svg {
+      width: 48px;
+      height: 48px;
+      stroke-width: 1.75;
+    }
+
+    /* File list */
+    .file-list-container {
+      max-height: 320px;
+      overflow-y: auto;
+      margin-top: 20px;
+    }
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      background: #F9FAFE;
+      border-radius: 12px;
+      margin-bottom: 8px;
+      border: 1px solid #EDF2F8;
+      transition: all 0.2s;
+    }
+    .file-item:hover {
+      background: #FFFFFF;
+      border-color: #DCE5EF;
+    }
+    .file-name {
+      font-weight: 500;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .file-size {
+      font-size: 0.7rem;
+      color: #8A99B4;
+      margin-left: 8px;
+    }
+    .remove-file {
+      background: none;
+      border: none;
+      color: #94A3B8;
+      cursor: pointer;
+      font-size: 1.2rem;
+      padding: 6px 10px;
+      border-radius: 30px;
+      transition: all 0.2s;
+    }
+    .remove-file:hover {
+      color: #E53E3E;
+      background: #FFF5F5;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #8A99B4;
+    }
+
+    .btn-primary {
+      background: var(--brand-action);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.2s;
+      font-size: 0.95rem;
+      width: 100%;
+      margin-top: 20px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-primary:hover {
+      background: var(--brand-action-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(238,139,38,0.24);
+    }
+    .btn-primary:disabled {
+      background: #CBD5E1;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: white;
+      border: 1px solid #CBD5E1;
+      border-radius: 10px;
+      padding: 10px 20px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+    .btn-secondary:hover {
+      background: #F8FAFE;
+      border-color: #9AA9C1;
+    }
+
+    .extract-preview {
+      background: #F9FAFE;
+      border-radius: 14px;
+      padding: 20px;
+    }
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-bottom: 1px solid #EDF2F8;
+      padding: 14px 0;
+    }
+    .preview-label {
+      font-weight: 500;
+      color: #4A5B7A;
+    }
+    .match-badge {
+      background: #E4F0E7;
+      color: #1F7840;
+      border-radius: 10px;
+      padding: 2px 10px;
+      font-size: 0.7rem;
+      font-weight: 600;
+    }
+    .skill-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 10px 0;
+    }
+    .skill-chip-mini {
+      background: white;
+      border-radius: 8px;
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      border: 1px solid #DBE5F0;
+    }
+    .parsing-placeholder {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #5F7FBF;
+      font-size: 0.8rem;
+    }
+    .pulse {
+      width: 12px;
+      height: 12px;
+      background: var(--brand-action);
+      border-radius: 50%;
+      animation: pulse 1.2s infinite;
+      display: inline-block;
+    }
+    @keyframes pulse {
+      0% { opacity: 0.4; transform: scale(0.8);}
+      100% { opacity: 1; transform: scale(1.2);}
+    }
+    .progress-bar {
+      margin-top: 20px;
+      background: #EFF2F9;
+      border-radius: 20px;
+      height: 8px;
+      overflow: hidden;
+    }
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      background: var(--brand-action);
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+    .analysis-status {
+      text-align: center;
+      padding: 20px;
+    }
+    .success-message {
+      background: #E9F6EF;
+      border-radius: 20px;
+      padding: 14px;
+      margin-top: 20px;
+      text-align: center;
+      color: #2B6E3C;
+    }
+    .recommend-card {
+      background: #F2F5FF;
+      padding: 14px;
+      border-radius: 18px;
+      margin-top: 16px;
+    }
+
+    .job-selector {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+    .job-select-btn {
+      width: 100%;
+      border: 1px solid #E0E8F2;
+      background: #F9FAFE;
+      color: #1A2C3E;
+      padding: 12px 14px;
+      border-radius: 14px;
+      text-align: left;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      transition: 0.2s;
+      font: inherit;
+    }
+    .job-select-btn:hover,
+    .job-select-btn.active {
+      background: #EEF4FF;
+      border-color: var(--brand-action);
+    }
+    .pricing-panel {
+      background: #FFFFFF;
+      border: 1px solid #E8EEF6;
+      border-radius: 16px;
+      padding: 22px;
+      margin-top: 14px;
+    }
+    .pricing-panel h4 {
+      font-size: 0.98rem;
+      margin-bottom: 18px;
+    }
+    .pricing-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+      padding: 12px 0;
+      color: #52657F;
+      font-size: 0.86rem;
+    }
+    .pricing-row strong {
+      color: #17233A;
+    }
+    .rate-editor {
+      margin-top: 18px;
+      display: grid;
+      gap: 10px;
+    }
+    .rate-editor label {
+      color: #52657F;
+      font-size: 0.78rem;
+    }
+    .rate-input-line {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .rate-input-line input[type="number"] {
+      width: 132px;
+      border: 1px solid #D4DEEB;
+      border-radius: 12px;
+      padding: 10px 12px;
+      color: #17233A;
+      font-weight: 700;
+      font: inherit;
+    }
+    .rate-input-line input[type="range"] {
+      flex: 1;
+      accent-color: var(--brand-action);
+    }
+    .ai-advisory {
+      background: #F8FAFD;
+      border: 1px solid #E0E7F1;
+      border-radius: 10px;
+      padding: 13px 16px;
+      color: #253149;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-top: 14px;
+    }
+    .pricing-sources {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+    .source-item {
+      background: #F9FAFE;
+      border: 1px solid #EDF2F8;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 0.82rem;
+      color: #52657F;
+    }
+    .source-item strong {
+      color: #17233A;
+      display: block;
+      margin-bottom: 4px;
+    }
+    .orange-action {
+      background: var(--brand-action);
+    }
+    .orange-action:hover {
+      background: var(--brand-action-hover);
+      box-shadow: 0 6px 14px rgba(238,139,38,0.24);
+    }
+
+    @media (max-width: 900px) {
+      .workflow-grid { grid-template-columns: 1fr; }
+      .app-container { padding: 20px; }
+      .pricing-row { align-items: flex-start; flex-direction: column; gap: 4px; }
+      .rate-input-line { align-items: stretch; flex-direction: column; }
+      .rate-input-line input[type="number"] { width: 100%; }
+    }
+
+    .file-badge {
+      background: var(--brand-soft);
+      border-radius: 10px;
+      padding: 2px 8px;
+      font-size: 0.7rem;
+      color: #8A4E12;
+    }
+    .inline-icon,
+    .heading-icon,
+    .stage-icon {
+      width: 1.1em;
+      height: 1.1em;
+      stroke-width: 2.25;
+      flex: 0 0 auto;
+    }
+    .heading-icon {
+      vertical-align: -0.14em;
+      margin-right: 8px;
+    }
+    .inline-icon {
+      vertical-align: -0.18em;
+      margin-right: 6px;
+    }
+    .stage {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-label,
+    .skill-chip-mini,
+    .file-name,
+    .recommend-card,
+    .success-message {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+  </style>
+</head>
+<body>
+<div class="app-container">
+  <div class="header">
+    <h1><i data-lucide="circle-dollar-sign" class="heading-icon" aria-hidden="true"></i> Pricing Workshop</h1>
+    <p>AI-powered rate intelligence & job pricing simulation — batch upload multiple JDs for analysis.</p>
+  </div>
+
+  <!-- Stages -->
+  <div class="stage-stepper" id="stageStepper">
+    <div class="stage active-stage" data-stage="upload"><i data-lucide="folder-up" class="stage-icon" aria-hidden="true"></i> MULTI UPLOAD</div>
+    <div class="stage" data-stage="analysis"><i data-lucide="search" class="stage-icon" aria-hidden="true"></i> BATCH ANALYSIS</div>
+    <div class="stage" data-stage="pricing"><i data-lucide="badge-dollar-sign" class="stage-icon" aria-hidden="true"></i> PRICING & COMPARE</div>
+    <div class="stage" data-stage="review"><i data-lucide="circle-check" class="stage-icon" aria-hidden="true"></i> REVIEW & EXPORT</div>
+  </div>
+
+  <!-- Dynamic workflow area -->
+  <div class="workflow-grid" id="workflowContainer">
+    <div class="card" id="leftColumn"></div>
+    <div class="card" id="rightColumn"></div>
+  </div>
+</div>
+
+<script>
+  // -------------------- STATE MANAGEMENT --------------------
+  let currentStage = "upload";
+  let isAnalyzing = false;
+  let uploadedFiles = []; // array of { name, size, id, previewText }
+  let batchResults = []; // analysis results per file
+  let currentProgress = 0;
+  let selectedPricingIndex = 0;
+
+  const leftCol = document.getElementById('leftColumn');
+  const rightCol = document.getElementById('rightColumn');
+  const stages = document.querySelectorAll('.stage');
+
+  function icon(name, className = 'inline-icon') {
+    return `<i data-lucide="${name}" class="${className}" aria-hidden="true"></i>`;
+  }
+
+  function refreshIcons() {
+    if (window.lucide) {
+      lucide.createIcons();
+    }
+  }
+
+  function cleanDisplayText() {
+    document.querySelectorAll('p, span, li, .recommend-card, .success-message, .source-item').forEach(el => {
+      let html = el.innerHTML;
+      let next = html
+        .replace(/Â·/g, '&middot;')
+        .replace(/â€”/g, '&mdash;')
+        .replace(/â€¢/g, '&bull;');
+      if (next !== html) el.innerHTML = next;
+    });
+  }
+
+  function updateStageClasses() {
+    stages.forEach(stageEl => {
+      const stageVal = stageEl.getAttribute('data-stage');
+      stageEl.classList.remove('active-stage', 'completed');
+      if (stageVal === currentStage) {
+        stageEl.classList.add('active-stage');
+      } else if (
+        (currentStage === 'analysis' && stageVal === 'upload') ||
+        (currentStage === 'pricing' && (stageVal === 'upload' || stageVal === 'analysis')) ||
+        (currentStage === 'review' && (stageVal === 'upload' || stageVal === 'analysis' || stageVal === 'pricing'))
+      ) {
+        stageEl.classList.add('completed');
+      }
+    });
+  }
+
+  function updateStageUI() {
+    updateStageClasses();
+    renderWorkflow();
+  }
+
+  function escapeHTML(value) {
+    return String(value)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function safeTimestamp() {
+    return new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+  }
+
+  // Add multiple files
+  function addFiles(fileList) {
+    const validExtensions = ['.txt', '.pdf', '.docx'];
+    let addedCount = 0;
+    
+    for (let file of fileList) {
+      const ext = '.' + file.name.split('.').pop().toLowerCase();
+      if (validExtensions.includes(ext) || file.type === 'text/plain') {
+        // Check for duplicate by name
+        if (!uploadedFiles.some(f => f.name === file.name)) {
+          uploadedFiles.push({
+            name: file.name,
+            size: file.size,
+            id: Date.now() + Math.random() * 1000,
+            previewText: `Job description content for ${file.name}. Looking for AI, cloud, backend skills.`
+          });
+          addedCount++;
+        }
+      } else {
+        alert(`Unsupported file type: ${file.name}. Please upload .txt, .pdf, or .docx files.`);
+      }
+    }
+    
+    if (addedCount > 0) {
+      renderWorkflow();
+    }
+  }
+
+  function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    batchResults = batchResults.filter((_, i) => i !== index);
+    renderWorkflow();
+  }
+
+  function clearAllFiles() {
+    uploadedFiles = [];
+    batchResults = [];
+    renderWorkflow();
+  }
+
+  // Simulate AI extraction for a file
+  function simulateExtraction(fileName, previewText) {
+    const lower = previewText.toLowerCase();
+    const hasPython = lower.includes('python') || lower.includes('py');
+    const hasK8s = lower.includes('kubernetes') || lower.includes('k8s');
+    const hasLLM = lower.includes('llm') || lower.includes('generative ai') || lower.includes('langchain');
+    const hasAWS = lower.includes('aws') || lower.includes('cloud');
+    const hasReact = lower.includes('react') || lower.includes('frontend');
+    
+    const skills = [];
+    if (hasPython) skills.push('Python');
+    if (hasK8s) skills.push('Kubernetes');
+    if (hasLLM) skills.push('LLM/AI');
+    if (hasAWS) skills.push('AWS');
+    if (hasReact) skills.push('React');
+    if (skills.length === 0) skills.push('JavaScript', 'TypeScript', 'Node.js');
+    
+    let years = "5+";
+    if (lower.includes('senior')) years = "7+";
+    if (lower.includes('lead') || lower.includes('principal')) years = "8+";
+    if (lower.includes('entry') || lower.includes('junior')) years = "2+";
+    
+    let seniority = "Senior";
+    if (lower.includes('lead') || lower.includes('principal')) seniority = "Lead / Staff";
+    if (lower.includes('entry') || lower.includes('junior')) seniority = "Junior / Associate";
+    
+    let marketBase = 142000;
+    marketBase += hasLLM ? 26000 : 0;
+    marketBase += hasK8s ? 14000 : 0;
+    marketBase += hasAWS ? 8000 : 0;
+    marketBase += lower.includes('lead') || lower.includes('principal') ? 18000 : 0;
+    marketBase -= lower.includes('entry') || lower.includes('junior') ? 42000 : 0;
+    marketBase += Math.floor(Math.random() * 12000);
+    const recommendedNumeric = Math.round(marketBase / 500) * 500;
+    const marketLow = Math.round((marketBase - 22000) / 1000) * 1000;
+    const marketHigh = Math.round((marketBase + 28000) / 1000) * 1000;
+    const competitorLow = Math.round((marketBase - 18000) / 1000) * 1000;
+    const competitorHigh = Math.round((marketBase + 32000) / 1000) * 1000;
+    const recommended = `$${Math.round(recommendedNumeric / 1000)}k`;
+    const marketRange = `$${Math.round(marketLow / 1000)}k - $${Math.round(marketHigh / 1000)}k`;
+    
+    return {
+      jobTitle: fileName.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ").substring(0, 55),
+      matchScore: 82 + Math.floor(Math.random() * 15),
+      location: "Remote / United States",
+      coreSkills: skills,
+      minYears: years,
+      seniority: seniority,
+      marketRate: marketRange,
+      marketLow: marketLow,
+      marketHigh: marketHigh,
+      competitorLow: competitorLow,
+      competitorHigh: competitorHigh,
+      recommendedNumeric: recommendedNumeric,
+      editedRate: recommendedNumeric,
+      recommendedRate: recommended,
+      hiringDifficulty: skills.includes('LLM/AI') || skills.includes('Kubernetes') ? "High" : "Medium",
+      billRateUplift: skills.includes('LLM/AI') ? "+8.2%" : "+5.4%",
+      agencySuggestion: skills.includes('Kubernetes') ? "TalentBridge AI" : "HireForce Pro",
+      probabilityScore: 72 + Math.floor(Math.random() * 22) + "%",
+      demandTrend: skills.includes('LLM/AI') ? "+28% YoY for AI Engineers" : "+14% YoY for software roles",
+      talentAvailability: skills.includes('LLM/AI') ? "2.1k active profiles in USA" : "8.4k active profiles in USA",
+      advisory: skills.includes('Kubernetes') && skills.includes('LLM/AI')
+        ? "Upskilling in K8s and LLM increases candidate quality by 34%."
+        : "Broaden cloud and backend keywords to improve candidate supply.",
+      pricingResources: [
+        "Market benchmark from comparable role bands, seniority, location, and scarce skills.",
+        "Demand trend from current hiring velocity and skill-growth signals.",
+        "Talent availability from active candidate-pool size and probability-to-fill.",
+        "Competitor range from competing job posts and agency rate bands."
+      ]
+    };
+  }
+
+  async function startBatchAnalysis() {
+    if (uploadedFiles.length === 0) {
+      alert("Please upload at least one job description file to analyze.");
+      return;
+    }
+    
+    isAnalyzing = true;
+    currentStage = "analysis";
+    batchResults = [];
+    currentProgress = 0;
+    renderWorkflow();
+    
+    for (let i = 0; i < uploadedFiles.length; i++) {
+      await new Promise(resolve => setTimeout(resolve, 600));
+      const extracted = simulateExtraction(uploadedFiles[i].name, uploadedFiles[i].previewText);
+      batchResults[i] = {
+        ...uploadedFiles[i],
+        extracted: extracted
+      };
+      currentProgress = ((i + 1) / uploadedFiles.length) * 100;
+      renderWorkflow();
+    }
+    
+    isAnalyzing = false;
+    currentStage = "pricing";
+    renderWorkflow();
+  }
+
+  function moveToReview() {
+    if (currentStage === 'pricing' && batchResults.length > 0) {
+      currentStage = "review";
+      renderWorkflow();
+    }
+  }
+
+  function resetToUpload() {
+    currentStage = "upload";
+    uploadedFiles = [];
+    batchResults = [];
+    renderWorkflow();
+  }
+
+  // Export functions
+  function exportJSON() {
+    const exportData = {
+      workshopName: "HireIQ Multi-JD Pricing Workshop",
+      generatedAt: new Date().toISOString(),
+      totalJobs: batchResults.length,
+      analyses: batchResults.map(r => ({
+        fileName: r.name,
+        extracted: r.extracted
+      }))
+    };
+    const jsonStr = JSON.stringify(exportData, null, 2);
+    downloadFile(jsonStr, `hireiq_batch_pricing_${safeTimestamp()}.json`, "application/json");
+    showToast("JSON exported successfully!");
+  }
+
+  function exportCSV() {
+    const rows = [["Job Title", "Match Score", "Location", "Core Skills", "Min Years", "Seniority", "Market Rate", "Recommended Rate", "Hiring Difficulty", "Agency", "Probability"]];
+    batchResults.forEach(r => {
+      const e = r.extracted;
+      rows.push([
+        e.jobTitle, `${e.matchScore}%`, e.location, e.coreSkills.join("; "), e.minYears, e.seniority,
+        e.marketRate, e.recommendedRate, e.hiringDifficulty, e.agencySuggestion, e.probabilityScore
+      ]);
+    });
+    const csvContent = rows.map(row => row.map(cell => `"${String(cell).replace(/"/g, '""')}"`).join(",")).join("\n");
+    downloadFile("\uFEFF" + csvContent, `hireiq_batch_report.csv`, "text/csv");
+    showToast("CSV exported!");
+  }
+
+  function exportHTML() {
+    const reportRows = batchResults.map((r, idx) => {
+      const e = r.extracted;
+      return `<div class="job-card"><h3>${idx+1}. ${escapeHTML(e.jobTitle)}</h3><p><strong>Match Score:</strong> ${escapeHTML(e.matchScore)}% | <strong>Location:</strong> ${escapeHTML(e.location)}</p>
+      <p><strong>Core Skills:</strong> ${escapeHTML(e.coreSkills.join(', '))}</p>
+      <p><strong>Experience:</strong> ${escapeHTML(e.minYears)} · ${escapeHTML(e.seniority)}</p>
+      <p><strong>Market Rate:</strong> ${escapeHTML(e.marketRate)} | <strong>Recommended:</strong> ${escapeHTML(e.recommendedRate)}</p>
+      <p><strong>Hiring Difficulty:</strong> ${escapeHTML(e.hiringDifficulty)} | <strong>Probability:</strong> ${escapeHTML(e.probabilityScore)}</p>
+      <p><strong>Best Agency:</strong> ${escapeHTML(e.agencySuggestion)}</p></div>`;
+    }).join("");
+    const html = [
+      "<!DOCTYPE html>",
+      "<html>",
+      "<head>",
+      "<meta charset=\"UTF-8\">",
+      "<title>HireIQ Batch Report</title>",
+      "<style>",
+      "body{font-family:Inter,Arial,sans-serif;padding:40px;max-width:1200px;margin:0 auto;color:#1A2C3E;}",
+      "h1{color:#2C3E66;}",
+      ".job-card{border:1px solid #E2E8F0;border-radius:20px;padding:20px;margin:20px 0;}",
+      "<" + "/style>",
+      "<" + "/head>",
+      "<body>",
+      `<h1>HireIQ Multi-JD Pricing Report</h1><p>Generated: ${escapeHTML(new Date().toLocaleString())} | Total Jobs: ${batchResults.length}</p>`,
+      reportRows,
+      "<hr><p><em>AI-powered intelligence · HireIQ Platform</em></p>",
+      "<" + "/body>",
+      "<" + "/html>"
+    ].join("");
+    downloadFile(html, `hireiq_batch_report.html`, "text/html");
+    showToast("HTML report saved!");
+  }
+
+  function formatCurrency(value) {
+    return `$${Number(value || 0).toLocaleString('en-US')}`;
+  }
+
+  function formatCompactRange(low, high) {
+    return `$${Math.round(low / 1000)}k - $${Math.round(high / 1000)}k`;
+  }
+
+  function setSelectedPricingIndex(index) {
+    selectedPricingIndex = index;
+    renderWorkflow();
+  }
+
+  function updateEditedRate(value) {
+    const result = batchResults[selectedPricingIndex];
+    if (!result) return;
+    const numeric = Math.max(70000, Math.min(280000, Number(value) || result.extracted.recommendedNumeric));
+    result.extracted.editedRate = numeric;
+    result.extracted.recommendedRate = `$${Math.round(numeric / 1000)}k`;
+    const numberInput = document.getElementById('billRateInput');
+    const rangeInput = document.getElementById('billRateRange');
+    const display = document.getElementById('billRateDisplay');
+    if (numberInput) numberInput.value = numeric;
+    if (rangeInput) rangeInput.value = numeric;
+    if (display) display.textContent = formatCurrency(numeric);
+  }
+
+  function downloadFile(content, filename, mimeType) {
+    const blob = new Blob([content], { type: mimeType });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function showToast(msg) {
+    const toast = document.createElement('div');
+    toast.innerText = msg;
+    toast.style.position = 'fixed';
+    toast.style.bottom = '30px';
+    toast.style.right = '30px';
+    toast.style.backgroundColor = '#1F2A44';
+    toast.style.color = 'white';
+    toast.style.padding = '12px 24px';
+    toast.style.borderRadius = '40px';
+    toast.style.fontSize = '0.85rem';
+    toast.style.zIndex = '1000';
+    toast.style.boxShadow = '0 6px 14px rgba(0,0,0,0.1)';
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  function formatFileSize(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+  }
+
+  // RENDER FUNCTIONS
+  function renderWorkflow() {
+    updateStageClasses();
+    renderLeftColumn();
+    renderRightColumn();
+    cleanDisplayText();
+    refreshIcons();
+  }
+
+  function renderLeftColumn() {
+    if (currentStage === 'upload') {
+      leftCol.innerHTML = `
+        <h3 style="margin-bottom: 16px;">${icon('folder-up', 'heading-icon')} Upload Multiple Job Descriptions</h3>
+        <p style="margin-bottom: 20px; color:#4F6F8F;">Select multiple PDF, DOCX, or TXT files. Our AI will analyze each role independently.</p>
+        <div class="multi-upload-area" id="multiDropZone">
+          <div class="upload-icon">${icon('files', 'upload-icon-svg')}</div>
+          <div><strong>Click or drag & drop multiple files</strong></div>
+          <div style="font-size:0.75rem; margin-top: 8px;">Supports PDF, DOCX, TXT — Max 10MB each</div>
+        </div>
+        <div id="fileListContainer" class="file-list-container"></div>
+        <div style="display: flex; gap: 12px; margin-top: 16px;">
+          <button id="clearAllBtn" class="btn-secondary" style="flex:1;">${icon('trash-2')} Clear All</button>
+          <button id="startAnalysisBtn" class="btn-primary" style="margin-top:0; flex:2;" ${uploadedFiles.length === 0 ? 'disabled' : ''}>${icon('rocket')} Analyze ${uploadedFiles.length} File${uploadedFiles.length !== 1 ? 's' : ''}</button>
+        </div>
+      `;
+      
+      const dropZone = document.getElementById('multiDropZone');
+      if (dropZone) {
+        dropZone.addEventListener('click', () => {
+          const input = document.createElement('input');
+          input.type = 'file';
+          input.multiple = true;
+          input.accept = '.pdf,.docx,.txt';
+          input.onchange = (e) => addFiles(e.target.files);
+          input.click();
+        });
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.style.borderColor = '#EE8B26'; });
+        dropZone.addEventListener('dragleave', () => dropZone.style.borderColor = '#CFDFF0');
+        dropZone.addEventListener('drop', (e) => {
+          e.preventDefault();
+          addFiles(e.dataTransfer.files);
+          dropZone.style.borderColor = '#CFDFF0';
+        });
+      }
+      
+      const container = document.getElementById('fileListContainer');
+      if (container) {
+        if (uploadedFiles.length === 0) {
+          container.innerHTML = `<div class="empty-state">${icon('inbox', 'heading-icon')} No files uploaded yet.<br>Click or drag files above to get started.</div>`;
+        } else {
+          container.innerHTML = uploadedFiles.map((f, idx) => {
+            const displayName = f.name.length > 40 ? f.name.substring(0, 37) + '...' : f.name;
+            return `
+            <div class="file-item">
+              <div class="file-name">
+                ${icon('file-text')}
+                ${escapeHTML(displayName)}
+                <span class="file-size">(${formatFileSize(f.size)})</span>
+                <span class="file-badge">Pending</span>
+              </div>
+              <button class="remove-file" data-index="${idx}" aria-label="Remove file">${icon('x')}</button>
+            </div>
+          `;
+          }).join('');
+          document.querySelectorAll('.remove-file').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+              const idx = parseInt(btn.getAttribute('data-index'));
+              removeFile(idx);
+            });
+          });
+        }
+      }
+      
+      document.getElementById('clearAllBtn')?.addEventListener('click', clearAllFiles);
+      document.getElementById('startAnalysisBtn')?.addEventListener('click', startBatchAnalysis);
+    } 
+    else if (currentStage === 'analysis') {
+      leftCol.innerHTML = `
+        <h3>${icon('settings', 'heading-icon')} Batch AI Analysis in Progress</h3>
+        <div class="analysis-status">
+          <div class="parsing-placeholder" style="justify-content: center;">
+            <span class="pulse"></span> <span>Analyzing ${uploadedFiles.length} job descriptions...</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" style="width: ${currentProgress}%;"></div>
+          </div>
+          <p style="margin-top: 16px; color: #4A5B7A;">${Math.round(currentProgress / 100 * uploadedFiles.length)} of ${uploadedFiles.length} completed</p>
+          <div class="skill-chips" style="justify-content: center; margin-top: 20px;">
+            <span class="skill-chip-mini">${icon('search')} Extracting skills</span>
+            <span class="skill-chip-mini">${icon('bar-chart-3')} Market alignment</span>
+            <span class="skill-chip-mini">${icon('circle-dollar-sign')} Rate benchmarking</span>
+          </div>
+        </div>
+      `;
+    }
+    else if (currentStage === 'pricing') {
+      if (selectedPricingIndex >= batchResults.length) selectedPricingIndex = 0;
+      const selected = batchResults[selectedPricingIndex]?.extracted;
+      leftCol.innerHTML = `
+        <h3>${icon('badge-dollar-sign', 'heading-icon')} Pricing Intelligence</h3>
+        <p style="color:#5E6F8D; margin: 8px 0 16px;">Pick an uploaded JD, then adjust the recommended bill rate before review.</p>
+        <div id="jobsCompareList" class="job-selector"></div>
+        <div id="pricingEditor"></div>
+        <button id="continueToReviewBtn" class="btn-primary orange-action" style="margin-top: 20px;">Continue to Review ${icon('arrow-right')}</button>
+      `;
+      const compareContainer = document.getElementById('jobsCompareList');
+      if (compareContainer && batchResults.length > 0) {
+        compareContainer.innerHTML = batchResults.map((res, idx) => {
+          const e = res.extracted;
+          return `
+            <button class="job-select-btn ${idx === selectedPricingIndex ? 'active' : ''}" data-index="${idx}" type="button">
+              <span><strong>${escapeHTML(e.jobTitle)}</strong><br><small>${escapeHTML(res.name)}</small></span>
+              <span class="match-badge">${escapeHTML(e.recommendedRate)}</span>
+            </button>
+          `;
+        }).join('');
+        document.querySelectorAll('.job-select-btn').forEach(btn => {
+          btn.addEventListener('click', () => setSelectedPricingIndex(parseInt(btn.getAttribute('data-index'))));
+        });
+      }
+      const pricingEditor = document.getElementById('pricingEditor');
+      if (pricingEditor && selected) {
+        pricingEditor.innerHTML = `
+          <div class="pricing-panel">
+            <h4>AI-Powered Pricing Intelligence</h4>
+            <div class="pricing-row"><span>Market Rate Benchmark:</span><strong>${formatCompactRange(selected.marketLow, selected.marketHigh)}</strong></div>
+            <div class="pricing-row"><span>Recommended Bill Rate:</span><strong id="billRateDisplay">${formatCurrency(selected.editedRate)}</strong> <span class="match-badge">${escapeHTML(selected.billRateUplift)}</span></div>
+            <div class="pricing-row"><span>Hiring Difficulty:</span><strong>${escapeHTML(selected.hiringDifficulty)} · Probability of Fill: ${escapeHTML(selected.probabilityScore)}</strong></div>
+            <div class="rate-editor">
+              <label for="billRateRange">Adjust rate manually:</label>
+              <div class="rate-input-line">
+                <input id="billRateInput" type="number" min="70000" max="280000" step="500" value="${selected.editedRate}" aria-label="Recommended bill rate">
+                <input id="billRateRange" type="range" min="70000" max="280000" step="500" value="${selected.editedRate}" aria-label="Adjust recommended bill rate">
+              </div>
+            </div>
+          </div>
+        `;
+        document.getElementById('billRateInput')?.addEventListener('input', (e) => updateEditedRate(e.target.value));
+        document.getElementById('billRateRange')?.addEventListener('input', (e) => updateEditedRate(e.target.value));
+      }
+      document.getElementById('continueToReviewBtn')?.addEventListener('click', moveToReview);
+    }
+    else if (currentStage === 'review') {
+      const avgMatch = batchResults.length ? Math.round(batchResults.reduce((acc, r) => acc + r.extracted.matchScore, 0) / batchResults.length) : 0;
+      const avgRate = batchResults.length ? batchResults.reduce((acc, r) => acc + Number(r.extracted.editedRate || r.extracted.recommendedNumeric || 0), 0) / batchResults.length : 0;
+      
+      leftCol.innerHTML = `
+        <h3>${icon('circle-check', 'heading-icon')} Review & Export Results</h3>
+        <div class="extract-preview">
+          <div class="preview-row"><span class="preview-label">${icon('bar-chart-3')} Total Jobs Analyzed</span><span><strong>${batchResults.length}</strong></span></div>
+          <div class="preview-row"><span class="preview-label">${icon('trophy')} Average Match Score</span><span><strong>${avgMatch}%</strong></span></div>
+          <div class="preview-row"><span class="preview-label">${icon('circle-dollar-sign')} Average Recommended Rate</span><span><strong>${formatCurrency(Math.round(avgRate))}</strong></span></div>
+          <div class="preview-row"><span class="preview-label">${icon('flame')} Top Skill in Demand</span><span>${getTopSkill()}</span></div>
+        </div>
+        <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+          <button id="exportJSONBtn" style="flex:1;" class="btn-export">${icon('file-json')} Export JSON</button>
+          <button id="exportCSVBtn" style="flex:1;" class="btn-export">${icon('table')} Export CSV</button>
+          <button id="exportHTMLBtn" style="flex:1;" class="btn-export">${icon('printer')} HTML Report</button>
+        </div>
+        <button id="resetBtn" class="btn-secondary" style="width:100%; margin-top: 16px;">${icon('rotate-ccw')} Start Over (New Batch)</button>
+        <div class="success-message" style="margin-top: 16px;">${icon('circle-check')} All analyses complete. Download your reports above.</div>
+      `;
+      document.getElementById('exportJSONBtn')?.addEventListener('click', exportJSON);
+      document.getElementById('exportCSVBtn')?.addEventListener('click', exportCSV);
+      document.getElementById('exportHTMLBtn')?.addEventListener('click', exportHTML);
+      document.getElementById('resetBtn')?.addEventListener('click', resetToUpload);
+    }
+  }
+
+  function getTopSkill() {
+    if (!batchResults.length) return "N/A";
+    const allSkills = batchResults.flatMap(r => r.extracted.coreSkills);
+    const freq = {};
+    allSkills.forEach(s => freq[s] = (freq[s] || 0) + 1);
+    let top = "Python";
+    let max = 0;
+    for (let [k, v] of Object.entries(freq)) if (v > max) { max = v; top = k; }
+    return `${top} (${max}x)`;
+  }
+
+  function renderRightColumn() {
+    if (currentStage === 'upload') {
+      rightCol.innerHTML = `
+        <h3>${icon('clipboard-list', 'heading-icon')} Batch Upload Preview</h3>
+        <div class="extract-preview">
+          <div style="text-align: center; padding: 20px;">
+            ${icon('book-open', 'heading-icon')}
+            <p style="margin-top: 12px; color: #4A5B7A;">Upload multiple job descriptions to compare market rates, skill demands, and agency recommendations side by side.</p>
+            <p style="margin-top: 16px; font-size: 0.75rem; color: #6C86A3;">${icon('circle-check')} Batch analysis reduces time-to-insight by 73%</p>
+          </div>
+        </div>
+      `;
+    } 
+    else if (currentStage === 'analysis') {
+      if (!isAnalyzing && batchResults.length === uploadedFiles.length && uploadedFiles.length > 0) {
+        rightCol.innerHTML = `
+          <h3>${icon('sparkles', 'heading-icon')} Analysis Complete</h3>
+          <div class="extract-preview">
+            <div class="success-message">${icon('circle-check')} ${batchResults.length} job descriptions successfully analyzed. Click "Continue to Export" to review pricing comparison.</div>
+            <div class="recommend-card">${icon('lightbulb')} AI Insight: Multiple roles show high demand for Kubernetes & LLM skills — consider cross-functional hiring strategy.</div>
+          </div>
+        `;
+      } else {
+        rightCol.innerHTML = `
+          <h3>${icon('refresh-cw', 'heading-icon')} Processing Batch</h3>
+          <div class="extract-preview">
+            <div class="parsing-placeholder"><span class="pulse"></span> AI extracting skills, experience, and market data for each role...</div>
+            <div class="skill-chips" style="margin-top: 16px;">
+              <span class="skill-chip-mini">${icon('file-pen')} Parsing job titles</span>
+              <span class="skill-chip-mini">${icon('search')} Identifying skills</span>
+              <span class="skill-chip-mini">${icon('circle-dollar-sign')} Benchmarking rates</span>
+            </div>
+          </div>
+        `;
+      }
+    }
+    else if (currentStage === 'pricing') {
+      const topSkill = getTopSkill();
+      const selected = batchResults[selectedPricingIndex]?.extracted;
+      rightCol.innerHTML = `
+        <h3>${icon('bar-chart-3', 'heading-icon')} Market Intelligence Snapshot</h3>
+        ${selected ? `
+          <div class="pricing-panel">
+            <div class="pricing-row"><span>Market Demand Trend</span><strong>${escapeHTML(selected.demandTrend)}</strong></div>
+            <div class="pricing-row"><span>Talent Availability</span><strong>${escapeHTML(selected.talentAvailability)}</strong></div>
+            <div class="pricing-row"><span>Competitor Rate Range</span><strong>${formatCompactRange(selected.competitorLow, selected.competitorHigh)}</strong></div>
+            <div class="ai-advisory"><strong>AI Advisory:</strong> ${escapeHTML(selected.advisory)}</div>
+          </div>
+          <div class="pricing-sources">
+            <div class="source-item"><strong>How this price is calculated</strong>Base market band + seniority + scarce skills + location + competitor pressure - talent availability risk.</div>
+            ${selected.pricingResources.map(source => `<div class="source-item"><strong>${icon('database')} Pricing Resource</strong>${escapeHTML(source)}</div>`).join('')}
+          </div>
+        ` : `
+          <div class="extract-preview">
+            <div class="preview-row"><span class="preview-label">${icon('flame')} Hottest Skill</span><span><strong>${topSkill}</strong></span></div>
+            <div class="preview-row"><span class="preview-label">${icon('chart-line')} Avg Hiring Difficulty</span><span>${getAvgDifficulty()}</span></div>
+            <div class="preview-row"><span class="preview-label">${icon('medal')} Top Agency Match</span><span>${getTopAgency()}</span></div>
+          </div>
+        `}
+      `;
+    }
+    else if (currentStage === 'review') {
+      rightCol.innerHTML = `
+        <h3>${icon('paperclip', 'heading-icon')} Export Ready</h3>
+        <div class="extract-preview">
+          <div class="success-message">${icon('circle-check')} All pricing data ready for export. Choose your preferred format to download consolidated reports.</div>
+          <div style="margin-top: 20px;">
+            <strong>${icon('package')} Included in export:</strong>
+            <ul style="margin-left: 20px; margin-top: 8px;">
+              <li>Per-job pricing recommendations</li>
+              <li>Skill gap summaries</li>
+              <li>Agency rankings & probabilities</li>
+              <li>Market rate benchmarks</li>
+            </ul>
+          </div>
+        </div>
+      `;
+    }
+  }
+
+  function getAvgDifficulty() {
+    if (!batchResults.length) return "N/A";
+    const diff = batchResults.map(r => r.extracted.hiringDifficulty === "High" ? 2 : 1);
+    const avg = diff.reduce((a, b) => a + b, 0) / diff.length;
+    return avg > 1.5 ? "High" : "Moderate";
+  }
+
+  function getTopAgency() {
+    if (!batchResults.length) return "N/A";
+    const agencyCount = {};
+    batchResults.forEach(r => agencyCount[r.extracted.agencySuggestion] = (agencyCount[r.extracted.agencySuggestion] || 0) + 1);
+    let best = "TalentBridge AI";
+    let max = 0;
+    for (let [k, v] of Object.entries(agencyCount)) if (v > max) { max = v; best = k; }
+    return best;
+  }
+
+  // Add style for btn-export if not present
+  const style = document.createElement('style');
+  style.textContent = `.btn-export { background: #FFF4E8; color: #8A4E12; border: 1px solid #F4D6B4; padding: 10px; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 8px; } .btn-export:hover { background: #EE8B26; color: #fff; transform: translateY(-1px); } .rate-badge { display: inline-block; }`;
+  document.head.appendChild(style);
+
+  updateStageUI();
+</script>
+</body>
+</html>

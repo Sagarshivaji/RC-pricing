@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RC Pricing Dashboard | Techgene</title>
+    <!-- Google Fonts + simple reset -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 (free icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --brand-action: #EE8B26;
+            --brand-action-hover: #D97717;
+            --brand-ink: #13243A;
+            --brand-muted: #5E6F8D;
+            --brand-border: #E5ECF5;
+            --brand-soft: #FFF4E8;
+        }
+
+        body {
+            background: #F5F7FB;
+            font-family: 'Inter', sans-serif;
+            color: var(--brand-ink);
+            padding: 32px 40px;
+        }
+
+        /* main container */
+        .dashboard-container {
+            max-width: 1440px;
+            margin: 0 auto;
+        }
+
+        /* header / top bar */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--brand-ink);
+            letter-spacing: -0.3px;
+        }
+
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #5e7a93;
+            font-weight: 500;
+            margin-top: 4px;
+            letter-spacing: 0.3px;
+        }
+
+        .badge-tech {
+            background: var(--brand-soft);
+            padding: 6px 14px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #8A4E12;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* stats grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px 20px;
+            box-shadow: 0 10px 26px rgba(15,34,61,0.06), 0 1px 3px rgba(15,34,61,0.06);
+            transition: all 0.2s ease;
+            border: 1px solid var(--brand-border);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 18px 30px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-title {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+            color: #5c6f87;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .stat-number {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: #0f2b3b;
+            margin: 12px 0 6px 0;
+            line-height: 1.1;
+        }
+
+        .stat-trend {
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f9f0;
+            padding: 4px 10px;
+            border-radius: 10px;
+            color: #2b6e3c;
+        }
+
+        .trend-up {
+            color: #2c7a4b;
+        }
+
+        .stat-footnote {
+            font-size: 0.7rem;
+            color: #7e8d9e;
+            margin-top: 10px;
+            border-top: 1px solid #eef2f5;
+            padding-top: 8px;
+        }
+
+        .risk-badge {
+            background: #fff0f0;
+            color: #bc3f2e;
+        }
+
+        .critical {
+            color: #c2412c;
+            font-weight: 700;
+        }
+
+        /* double column layout: pending + reports */
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            margin-top: 8px;
+        }
+
+        .pending-section {
+            flex: 2;
+            min-width: 280px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 26px rgba(15,34,61,0.06), 0 1px 3px rgba(15,34,61,0.06);
+            border: 1px solid var(--brand-border);
+            overflow-x: auto;
+        }
+
+        .reports-section {
+            flex: 1.1;
+            min-width: 260px;
+            background: #ffffff;
+            border-radius: 8px;
+            padding: 20px 0 20px 0;
+            border: 1px solid var(--brand-border);
+            height: fit-content;
+        }
+
+        .section-header {
+            padding: 18px 24px 8px 24px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: #1e3b5c;
+            border-bottom: 2px solid #eef2fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .table-wrapper {
+            padding: 0 4px 12px 4px;
+            overflow-x: auto;
+        }
+
+        .approvals-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .approvals-table th {
+            text-align: left;
+            padding: 16px 16px 12px 16px;
+            color: #58738c;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #edf2f7;
+        }
+
+        .approvals-table td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #f0f4fa;
+            vertical-align: middle;
+        }
+
+        .client-role {
+            font-weight: 600;
+            color: #1f3e54;
+        }
+
+        .role-sub {
+            font-size: 0.7rem;
+            color: #6883a0;
+            display: block;
+            margin-top: 4px;
+        }
+
+        .proposed-rate {
+            font-weight: 700;
+            color: #8A4E12;
+        }
+
+        .confidence-badge {
+            background: #eaf8ee;
+            color: #1f7840;
+            border-radius: 10px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+            text-align: center;
+        }
+
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-approve {
+            background: none;
+            border: none;
+            color: white;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            background: var(--brand-action);
+            padding: 6px 14px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-reject {
+            background: none;
+            border: none;
+            color: #b1544a;
+            font-weight: 600;
+            font-size: 0.75rem;
+            cursor: pointer;
+            background: #fff3f0;
+            padding: 6px 14px;
+            border-radius: 10px;
+            transition: 0.2s;
+        }
+
+        .btn-approve:hover {
+            background: var(--brand-action-hover);
+        }
+        .btn-reject:hover {
+            background: #ffe0db;
+        }
+
+        /* reports list */
+        .reports-list {
+            padding: 12px 18px 8px 18px;
+        }
+        .report-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 8px;
+            border-bottom: 1px solid #edf2f8;
+            transition: background 0.1s ease;
+        }
+        .report-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .report-icon {
+            font-size: 1.3rem;
+            color: #557da5;
+            width: 32px;
+            text-align: center;
+        }
+        .report-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #1e3b5a;
+        }
+        .report-meta {
+            font-size: 0.7rem;
+            color: #8899b0;
+            margin-top: 4px;
+        }
+        .download-icon {
+            color: #7d94af;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: 30px;
+            transition: 0.2s;
+        }
+        .download-icon:hover {
+            background: var(--brand-soft);
+            color: var(--brand-action);
+        }
+
+        hr {
+            margin: 12px 0;
+            border-color: #ecf3f9;
+        }
+
+        @media (max-width: 780px) {
+            body {
+                padding: 20px 16px;
+            }
+            .stat-number {
+                font-size: 2rem;
+            }
+            .section-header {
+                padding: 14px 18px;
+            }
+        }
+
+        .footer-note {
+            margin-top: 32px;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #8d9bb0;
+        }
+
+        i.icon-spacing {
+            margin-right: 6px;
+        }
+        .alert-high {
+            background: #ffe9e5;
+            color: #c2412c;
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <!-- header with logo & tagline -->
+    <div class="header">
+        <div class="logo-area">
+            <h1><i class="fas fa-chart-line" style="color: #EE8B26; margin-right: 6px;"></i> RC Pricing</h1>
+            <p>powered by Techgene · intelligent rate intelligence</p>
+        </div>
+        <div class="badge-tech">
+            <i class="fas fa-microchip"></i> <span>AI-driven analytics · v2.4</span>
+        </div>
+    </div>
+
+    <!-- KPI CARDS matching stats: ACTIVE REQUESTS, PENDING APPROVALS, RECENT PRICING REPORTS, AVG MARGIN, HIGH-RISK ALERTS -->
+    <div class="stats-grid">
+        <!-- Active Requests -->
+        <div class="stat-card">
+            <div class="stat-title">
+                ACTIVE REQUESTS
+                <i class="fas fa-rocket" style="color:#EE8B26;"></i>
+            </div>
+            <div class="stat-number">142</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up"></i> +12% vs last month</div>
+            <div class="stat-footnote">Open pricing requests</div>
+        </div>
+        <!-- Pending Approvals -->
+        <div class="stat-card">
+            <div class="stat-title">
+                PENDING APPROVALS
+                <i class="fas fa-clock"></i>
+            </div>
+            <div class="stat-number">42</div>
+            <div class="stat-trend"><i class="fas fa-arrow-up"></i> +12% vs last month</div>
+            <div class="stat-footnote">Awaiting review</div>
+        </div>
+        <!-- RECENT PRICING REPORTS (accuracy) -->
+        <div class="stat-card">
+            <div class="stat-title">
+                RECENT PRICING REPORTS
+                <i class="fas fa-file-alt"></i>
+            </div>
+            <div class="stat-number">3,104</div>
+            <div class="stat-trend" style="background:#eaf2fc;">✅ 98% Accurate</div>
+            <div class="stat-footnote">Last 30 days intelligence</div>
+        </div>
+        <!-- AVG MARGIN -->
+        <div class="stat-card">
+            <div class="stat-title">
+                AVG MARGIN
+                <i class="fas fa-percent"></i>
+            </div>
+            <div class="stat-number">24.8%</div>
+            <div class="stat-trend">📊 Optimal Range</div>
+            <div class="stat-footnote">Healthy +2.1% vs forecast</div>
+        </div>
+        <!-- HIGH-RISK ALERTS -->
+        <div class="stat-card" style="border-left: 4px solid #e25c4a;">
+            <div class="stat-title">
+                HIGH-RISK ALERTS
+                <i class="fas fa-exclamation-triangle" style="color:#c2412c;"></i>
+            </div>
+            <div class="stat-number" style="color:#c2412c;">07</div>
+            <div class="stat-trend risk-badge"><i class="fas fa-bell"></i> Critical Action Required</div>
+            <div class="stat-footnote">Response needed within 48h</div>
+        </div>
+    </div>
+
+    <!-- Two column: Pending Approvals table & Recent Reports -->
+    <div class="two-columns">
+        <!-- Pending approvals section (table) -->
+        <div class="pending-section">
+            <div class="section-header">
+                <span><i class="fas fa-clipboard-list" style="margin-right: 10px;"></i> Pending Approvals</span>
+                <span style="font-size: 0.7rem; background:#FFF4E8; color:#8A4E12; padding: 4px 12px; border-radius: 10px;">4 requests</span>
+            </div>
+            <div class="table-wrapper">
+                <table class="approvals-table">
+                    <thead>
+                        <tr><th>REQUEST ID</th><th>CLIENT / ROLE</th><th>PROPOSED RATE</th><th>AI CONFIDENCE</th><th>ACTION</th></tr>
+                    </thead>
+                    <tbody id="pendingTableBody">
+                        <!-- dynamic rows injected from JS but matching exact style and data #RQ-8821 multiple times but with slight variation for realism, given original image shows similar entries -->
+                        <!-- We'll produce 4 unique rows to match design feel but keep some detail like different roles/rates to make it lively -->
+                    </tbody>
+                </table>
+            </div>
+            <div style="padding: 8px 24px 20px 24px; font-size:0.7rem; color:#6682a0; border-top:1px solid #eef2f8;">
+                <i class="fas fa-robot"></i> AI confidence scores based on market benchmarks & historical margins
+            </div>
+        </div>
+
+        <!-- Recent Reports section -->
+        <div class="reports-section">
+            <div class="section-header" style="border-bottom: none; padding-bottom: 8px;">
+                <span><i class="fas fa-folder-open"></i> Recent Reports</span>
+                <i class="fas fa-download" style="color:#809ab3; cursor:default;"></i>
+            </div>
+            <div class="reports-list">
+                <!-- Q1 Pricing Outlook -->
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-icon"><i class="fas fa-file-pdf"></i></div>
+                        <div>
+                            <div class="report-name">Q1 Pricing Outlook</div>
+                            <div class="report-meta">PDF • 4.2 MB</div>
+                        </div>
+                    </div>
+                    <div class="download-icon"><i class="fas fa-download"></i></div>
+                </div>
+                <!-- Regional Benchmarks -->
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-icon"><i class="fas fa-file-excel"></i></div>
+                        <div>
+                            <div class="report-name">Regional Benchmarks</div>
+                            <div class="report-meta">XLSX • 12.8 MB</div>
+                        </div>
+                    </div>
+                    <div class="download-icon"><i class="fas fa-download"></i></div>
+                </div>
+                <!-- AI Talent Scarcity -->
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-icon"><i class="fas fa-file-pdf"></i></div>
+                        <div>
+                            <div class="report-name">AI Talent Scarcity</div>
+                            <div class="report-meta">PDF • 2.1 MB</div>
+                        </div>
+                    </div>
+                    <div class="download-icon"><i class="fas fa-download"></i></div>
+                </div>
+                <!-- Extra internal report (bonus to make reports area richer) -->
+                <div class="report-item">
+                    <div class="report-info">
+                        <div class="report-icon"><i class="fas fa-chart-simple"></i></div>
+                        <div>
+                            <div class="report-name">H2 Margin Analysis</div>
+                            <div class="report-meta">PPTX • 6.3 MB</div>
+                        </div>
+                    </div>
+                    <div class="download-icon"><i class="fas fa-download"></i></div>
+                </div>
+            </div>
+            <div style="margin: 16px 22px 0 22px; border-top: 1px solid #edf2f8;"></div>
+            <div style="padding: 14px 22px 8px 22px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-weight: 500; font-size: 0.75rem; color:#42749b;"><i class="fas fa-chart-line"></i> Full library</span>
+                    <span style="font-size:0.7rem; background:#FFF4E8; color:#8A4E12; padding:4px 12px; border-radius: 10px;">12 reports available</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- subtle footnote as in dashboard style -->
+    <div class="footer-note">
+        <i class="fas fa-chart-simple"></i> Real-time pricing intelligence · Last sync: today 09:42 AM
+    </div>
+</div>
+
+<script>
+    // Dynamic generation of pending approvals with richer data - matches the original design showing #RQ-8821 and similar
+    // but we can create variety while keeping same structure: multiple Astra Financial entries + other clients to mirror originality.
+    // We'll also include approve/reject actions with live UI updates (simple removal on approve/reject)
+    const pendingData = [
+        { id: "#RQ-8821", client: "Astra Financial", role: "Snr DevOps Engineer", rate: "$145.00/hr", confidence: "94%" },
+        { id: "#RQ-8834", client: "Astra Financial", role: "Cloud Architect", rate: "$168.00/hr", confidence: "91%" },
+        { id: "#RQ-8842", client: "NexGen Solutions", role: "Lead Data Engineer", rate: "$132.00/hr", confidence: "96%" },
+        { id: "#RQ-8850", client: "Meridian Bank", role: "Security Specialist", rate: "$158.00/hr", confidence: "88%" }
+    ];
+
+    function cleanDisplayText() {
+        const replacements = [
+            [/Â·/g, '&middot;'],
+            [/â€¢/g, '&bull;'],
+            [/âœ…/g, '<i class="fas fa-check-circle"></i>'],
+            [/ðŸ“Š/g, '<i class="fas fa-chart-column"></i>']
+        ];
+        document.querySelectorAll('p, span, .report-meta, .stat-trend, .footer-note').forEach(el => {
+            let html = el.innerHTML;
+            let next = html;
+            replacements.forEach(([pattern, replacement]) => {
+                next = next.replace(pattern, replacement);
+            });
+            if (next !== html) el.innerHTML = next;
+        });
+    }
+
+    // Function to render table rows
+    function renderPendingTable() {
+        const tbody = document.getElementById('pendingTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        pendingData.forEach((item, idx) => {
+            const row = tbody.insertRow();
+            // REQUEST ID
+            const cellId = row.insertCell(0);
+            cellId.innerHTML = `<span style="font-weight:600;">${item.id}</span>`;
+            // CLIENT / ROLE
+            const cellClient = row.insertCell(1);
+            cellClient.innerHTML = `<div class="client-role">${item.client}</div><div class="role-sub">${item.role}</div>`;
+            // PROPOSED RATE
+            const cellRate = row.insertCell(2);
+            cellRate.innerHTML = `<span class="proposed-rate">${item.rate}</span>`;
+            // AI CONFIDENCE
+            const cellConf = row.insertCell(3);
+            cellConf.innerHTML = `<span class="confidence-badge"><i class="fas fa-microchip"></i> ${item.confidence}</span>`;
+            // ACTION buttons
+            const cellAction = row.insertCell(4);
+            cellAction.className = "action-btns";
+            cellAction.innerHTML = `
+                <button class="btn-approve" data-id="${item.id}" data-action="approve"><i class="fas fa-check-circle"></i> Approve</button>
+                <button class="btn-reject" data-id="${item.id}" data-action="reject"><i class="fas fa-times-circle"></i> Reject</button>
+            `;
+        });
+
+        // attach event listeners to all approve/reject buttons dynamically
+        document.querySelectorAll('.btn-approve').forEach(btn => {
+            btn.removeEventListener('click', handleApprove);
+            btn.addEventListener('click', handleApprove);
+        });
+        document.querySelectorAll('.btn-reject').forEach(btn => {
+            btn.removeEventListener('click', handleReject);
+            btn.addEventListener('click', handleReject);
+        });
+    }
+
+    function handleApprove(e) {
+        const btn = e.currentTarget;
+        const requestId = btn.getAttribute('data-id');
+        // find index in pendingData array
+        const index = pendingData.findIndex(item => item.id === requestId);
+        if (index !== -1) {
+            pendingData.splice(index, 1);
+            renderPendingTable();
+            // also update the pending approvals count in KPI card
+            updatePendingCount();
+            showToast(`✅ Request ${requestId} approved`, 'success');
+        }
+    }
+
+    function handleReject(e) {
+        const btn = e.currentTarget;
+        const requestId = btn.getAttribute('data-id');
+        const index = pendingData.findIndex(item => item.id === requestId);
+        if (index !== -1) {
+            pendingData.splice(index, 1);
+            renderPendingTable();
+            updatePendingCount();
+            showToast(`⚠️ Request ${requestId} rejected`, 'info');
+        }
+    }
+
+    function updatePendingCount() {
+        const pendingCountSpan = document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-number');
+        if (pendingCountSpan) {
+            const newCount = pendingData.length;
+            pendingCountSpan.innerText = newCount;
+            // also adjust the "Pending Approvals" footnote badge
+            const pendingHeaderBadge = document.querySelector('.pending-section .section-header span:last-child');
+            if(pendingHeaderBadge && pendingHeaderBadge.tagName === 'SPAN') {
+                pendingHeaderBadge.innerText = `${newCount} request${newCount !== 1 ? 's' : ''}`;
+            }
+        }
+        // If we want also update visual trend? keep original +12% vs last month intact.
+        // But we also keep consistent
+    }
+
+    // simple toast popup simulation (non-intrusive)
+    function showToast(message, type) {
+        let toastContainer = document.getElementById('dynamic-toast');
+        if (!toastContainer) {
+            toastContainer = document.createElement('div');
+            toastContainer.id = 'dynamic-toast';
+            toastContainer.style.position = 'fixed';
+            toastContainer.style.bottom = '24px';
+            toastContainer.style.right = '24px';
+            toastContainer.style.zIndex = '9999';
+            toastContainer.style.display = 'flex';
+            toastContainer.style.flexDirection = 'column';
+            toastContainer.style.gap = '10px';
+            document.body.appendChild(toastContainer);
+        }
+        const toastEl = document.createElement('div');
+        toastEl.style.background = type === 'success' ? '#1f7b4d' : '#b5483b';
+        toastEl.style.color = 'white';
+        toastEl.style.padding = '12px 20px';
+        toastEl.style.borderRadius = '40px';
+        toastEl.style.fontSize = '0.8rem';
+        toastEl.style.fontWeight = '500';
+        toastEl.style.boxShadow = '0 8px 18px rgba(0,0,0,0.1)';
+        toastEl.style.backdropFilter = 'blur(2px)';
+        toastEl.style.fontFamily = 'Inter, sans-serif';
+        toastEl.innerText = message;
+        toastContainer.appendChild(toastEl);
+        setTimeout(() => {
+            toastEl.style.opacity = '0';
+            toastEl.style.transition = 'opacity 0.2s';
+            setTimeout(() => {
+                if (toastContainer.contains(toastEl)) toastContainer.removeChild(toastEl);
+                if (toastContainer.children.length === 0 && toastContainer.parentNode) toastContainer.remove();
+            }, 200);
+        }, 2800);
+    }
+
+    // simulate download click handlers with feedback
+    function attachDownloadHandlers() {
+        const downloadIcons = document.querySelectorAll('.download-icon');
+        downloadIcons.forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const reportDiv = icon.closest('.report-item');
+                if (reportDiv) {
+                    const reportNameElem = reportDiv.querySelector('.report-name');
+                    const reportName = reportNameElem ? reportNameElem.innerText : 'Report';
+                    showToast(`📎 Download started: ${reportName} (demo)`, 'success');
+                } else {
+                    showToast(`📎 Simulated download`, 'success');
+                }
+            });
+        });
+    }
+
+    // also set any extra "full library" or generic download listeners
+    function initReportsDownloads() {
+        attachDownloadHandlers();
+        // watch for dynamic changes (mutations but after re-render we can call again). In case pending render doesn't affect reports.
+    }
+
+    // after initial render, also adjust high risk and margin info matches original design (already static)
+    // and ensure pending count matches initial length (42 in static card but we have 4 row data shown in the table because design shows 4 rows but original image had 4 rows shown? Actually original image shows 4 rows same ID but to be functional we show real data and pending count was 42 as KPI which is different because KPI tracks total system pending, not only visible list. To be consistent with "42" KPI we keep 42 statically but note we show only 4 items for demonstration. we'll preserve both: KPI shows total pending 42 as static but inside component we have 4 examples. However the UX remains faithful but we'll make note the total pending count includes other teams. For perfect match we keep the 42 number in card but on table we show a few for clarity. The original image likely had repeated entries but here we add 4 real examples, keeping dashboard spirit.
+    // BUT we also want to have consistent data: In pending approvals we set accurate initial count of visible rows = 4. But KPI card shows 42 as per design. It's realistic because it includes all pending categories globally.
+    // We also can add a little info explaining.
+    // additional convenience to update actual pending approvals "number of shown requests" badge next to section header.
+    function updateSectionBadge() {
+        const badgeSpan = document.querySelector('.pending-section .section-header span:last-child');
+        if(badgeSpan && pendingData.length>=0) {
+            badgeSpan.innerText = `${pendingData.length} request${pendingData.length !== 1 ? 's' : ''}`;
+        }
+    }
+
+    // Override updatePendingCount to also update section badge
+    const originalUpdate = updatePendingCount;
+    window.updatePendingCount = function() {
+        if(originalUpdate) originalUpdate();
+        updateSectionBadge();
+    };
+    updatePendingCount = function() {
+        const pendingCountSpan = document.querySelector('.stats-grid .stat-card:nth-child(2) .stat-number');
+        if (pendingCountSpan && pendingCountSpan.innerText !== '42') {
+            // we keep the original 42 static because design shows 42 pending approvals from system-wide, don't modify to keep consistency
+            // but we also adjust badge with visible row count
+        }
+        if (pendingCountSpan && !pendingCountSpan.hasAttribute('data-locked')) {
+            // keep original 42 intact for original spec but we don't override. because card indicates total pending across org.
+            // we will preserve 42 as shown in original, the table shows active actionable approvals subset (4)
+        }
+        updateSectionBadge();
+    };
+
+    // final render
+    cleanDisplayText();
+    renderPendingTable();
+    // adjust pending badge to show visible entries (4)
+    updateSectionBadge();
+    initReportsDownloads();
+
+    // For the high-risk alert card: we can attach any additional action - not needed. keep 07.
+    // ensure the recent reports download triggers.
+    // also handle responsive and any extra hover
+    // add small note on high risk alerts tooltip
+    const highRiskCard = document.querySelector('.stat-card:last-child');
+    if(highRiskCard) {
+        highRiskCard.setAttribute('title', '7 high-risk pricing gaps detected - immediate review recommended');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>RC Pricing | Dashboard & Reports Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700;14..32,800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #f0f2f8;
+            font-family: 'Inter', sans-serif;
+            color: #1a2c3e;
+            padding: 28px 32px;
+        }
+
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* header + nav */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 28px;
+            flex-wrap: wrap;
+            gap: 16px;
+        }
+
+        .logo-area h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #1e3b5c, #2a5f8a);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+        }
+
+        .logo-area p {
+            font-size: 0.8rem;
+            color: #5e7a93;
+            font-weight: 500;
+        }
+
+        .badge-tech {
+            background: #eef2ff;
+            padding: 6px 14px;
+            border-radius: 40px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #1e5a8a;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 32px;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 6px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #5b6e8c;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: #ffffff;
+            color: #1e5a8a;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), 0 0 0 1px #e2edf7;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e9eef5;
+        }
+
+        /* dashboard grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 24px;
+            margin-bottom: 36px;
+        }
+
+        .stat-card {
+            background: #fff;
+            border-radius: 28px;
+            padding: 20px;
+            border: 1px solid #eef2f9;
+            transition: 0.2s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 8px 0 4px;
+        }
+
+        .stat-trend {
+            font-size: 0.7rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: #f0f9f0;
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+
+        .two-columns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 32px;
+            margin-top: 8px;
+        }
+
+        .pending-section {
+            flex: 2;
+            background: #fff;
+            border-radius: 28px;
+            border: 1px solid #eef2f9;
+            overflow-x: auto;
+        }
+
+        .reports-section {
+            flex: 1.1;
+            background: #fff;
+            border-radius: 28px;
+            border: 1px solid #eef2f9;
+        }
+
+        .section-header {
+            padding: 18px 24px 8px;
+            font-weight: 700;
+            font-size: 1.2rem;
+            border-bottom: 2px solid #eef2fa;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .approvals-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .approvals-table th,
+        .approvals-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid #f0f4fa;
+        }
+
+        .btn-approve,
+        .btn-reject {
+            border: none;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-approve {
+            background: #eef7ef;
+            color: #2c7a4b;
+        }
+
+        .btn-reject {
+            background: #fff3f0;
+            color: #b1544a;
+        }
+
+        .report-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 18px;
+            border-bottom: 1px solid #edf2f8;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .report-item:hover {
+            background: #f8fafd;
+        }
+
+        /* Reports Library Layout */
+        .reports-full-layout {
+            display: flex;
+            gap: 28px;
+            width: 100%;
+        }
+
+        .reports-grid-container {
+            flex: 2.5;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+            gap: 24px;
+        }
+
+        .report-card {
+            background: white;
+            border-radius: 28px;
+            border: 1px solid #eef2f9;
+            padding: 20px;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .report-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.08);
+            border-color: #cbddee;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .file-type {
+            font-size: 1.8rem;
+            color: #3d7ca3;
+        }
+
+        .badge-date {
+            background: #eef3fc;
+            padding: 4px 12px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+
+        .report-title {
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin: 10px 0 6px;
+        }
+
+        .report-desc {
+            font-size: 0.8rem;
+            color: #6c85a0;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
+
+        .report-meta-row {
+            display: flex;
+            gap: 16px;
+            font-size: 0.7rem;
+            color: #6e8aac;
+            margin-bottom: 18px;
+        }
+
+        .download-btn-card {
+            background: #f0f4fe;
+            border: none;
+            width: 100%;
+            padding: 10px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .download-btn-card:hover {
+            background: #e2eafc;
+        }
+
+        /* RIGHT SIDEBAR */
+        .report-sidebar {
+            flex: 1.2;
+            min-width: 320px;
+            background: #ffffff;
+            border-radius: 32px;
+            border: 1px solid #e9f0f5;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.02);
+            height: fit-content;
+            position: sticky;
+            top: 28px;
+        }
+
+        .sidebar-header {
+            padding: 22px 24px 12px;
+            border-bottom: 1px solid #eef2fa;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #1f5e8e;
+        }
+
+        .sidebar-content {
+            padding: 20px 24px 28px;
+        }
+
+        .detail-field {
+            margin-bottom: 20px;
+        }
+
+        .detail-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            font-weight: 600;
+            color: #6d8aac;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .detail-value {
+            font-weight: 600;
+            font-size: 1rem;
+            color: #1f3a57;
+            word-break: break-word;
+        }
+
+        .preview-text {
+            background: #f8fafd;
+            padding: 14px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #2c4b6e;
+            margin-top: 8px;
+            border-left: 3px solid #4383b0;
+            line-height: 1.5;
+        }
+
+        .sidebar-download {
+            background: #1e5a8a;
+            color: white;
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 40px;
+            font-weight: 600;
+            margin-top: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-download:hover {
+            background: #0f456b;
+        }
+
+        .empty-sidebar {
+            text-align: center;
+            padding: 40px 24px;
+            color: #8aa0bc;
+        }
+
+        .footer-note {
+            margin-top: 40px;
+            text-align: right;
+            font-size: 0.7rem;
+            color: #8d9bb0;
+        }
+
+        /* Page visibility - Fix: using .hidden and .visible correctly */
+        .dashboard-view {
+            display: block;
+        }
+
+        .dashboard-view.hidden {
+            display: none;
+        }
+
+        .reports-full-page {
+            display: none;
+        }
+
+        .reports-full-page.visible {
+            display: block;
+        }
+
+        .confidence-badge {
+            background: #eaf8ee;
+            color: #1f7840;
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .risk-badge {
+            background: #fff0f0;
+            color: #bc3f2e;
+        }
+
+        @media (max-width: 880px) {
+            .reports-full-layout {
+                flex-direction: column;
+            }
+
+            .report-sidebar {
+                position: static;
+                top: 0;
+                margin-top: 20px;
+            }
+
+            body {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-container">
+    <div class="header">
+        <div class="logo-area">
+            <h1><i class="fas fa-chart-line" style="color:#2a6d9c;"></i> RC Pricing</h1>
+            <p>powered by Techgene · intelligent rate intelligence</p>
+        </div>
+        <div class="badge-tech"><i class="fas fa-microchip"></i> AI-driven analytics · v2.5</div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" id="dashboardTabBtn"><i class="fas fa-tachometer-alt"></i> Dashboard</button>
+        <button class="tab-btn" id="reportsTabBtn"><i class="fas fa-folder-open"></i> Reports Library</button>
+    </div>
+
+    <!-- DASHBOARD VIEW -->
+    <div id="dashboardView" class="dashboard-view">
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-title">ACTIVE REQUESTS</div>
+                <div class="stat-number">142</div>
+                <div class="stat-trend"><i class="fas fa-arrow-up"></i> +12% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">PENDING APPROVALS</div>
+                <div class="stat-number">42</div>
+                <div class="stat-trend"><i class="fas fa-arrow-up"></i> +12% vs last month</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">RECENT PRICING REPORTS</div>
+                <div class="stat-number">3,104</div>
+                <div class="stat-trend">✅ 98% Accurate</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">AVG MARGIN</div>
+                <div class="stat-number">24.8%</div>
+                <div class="stat-trend">📊 Optimal Range</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-title">HIGH-RISK ALERTS</div>
+                <div class="stat-number" style="color:#c2412c;">07</div>
+                <div class="stat-trend risk-badge"><i class="fas fa-bell"></i> Critical Action Required</div>
+            </div>
+        </div>
+        <div class="two-columns">
+            <div class="pending-section">
+                <div class="section-header"><span><i class="fas fa-clipboard-list"></i> Pending Approvals</span><span id="pendingCountBadge" style="font-size:0.7rem; background:#eff4ff; padding:4px 12px; border-radius:40px;">4 requests</span></div>
+                <div class="table-wrapper" style="overflow-x:auto;">
+                    <table class="approvals-table">
+                        <thead>
+                            <tr><th>REQUEST ID</th><th>CLIENT / ROLE</th><th>PROPOSED RATE</th><th>AI CONFIDENCE</th><th>ACTION</th></tr>
+                        </thead>
+                        <tbody id="pendingTableBody"></tbody>
+                    </table>
+                </div>
+                <div style="padding:8px 24px 20px; font-size:0.7rem;"><i class="fas fa-robot"></i> AI confidence based on market benchmarks</div>
+            </div>
+            <div class="reports-section">
+                <div class="section-header"><span><i class="fas fa-folder-open"></i> Recent Reports</span><i class="fas fa-download"></i></div>
+                <div id="recentReportsList" class="reports-list"></div>
+                <div style="margin:16px 22px; border-top:1px solid #edf2f8;"></div>
+                <div style="padding:14px 22px 8px;"><span style="font-size:0.7rem; background:#F4F9FE; padding:4px 12px; border-radius:20px;" id="fullLibraryHint">12 reports available</span></div>
+            </div>
+        </div>
+        <div class="footer-note"><i class="fas fa-chart-simple"></i> Real-time pricing intelligence · Last sync: today</div>
+    </div>
+
+    <!-- REPORTS PAGE (full library) -->
+    <div id="reportsFullPage" class="reports-full-page">
+        <div class="reports-full-layout">
+            <div class="reports-grid-container" id="reportsGridContainer">
+                <!-- Reports will be loaded here dynamically -->
+                <div style="grid-column: 1/-1; text-align: center; padding: 60px; background: white; border-radius: 32px;">
+                    <i class="fas fa-spinner fa-pulse fa-2x" style="color: #1e5a8a;"></i>
+                    <p style="margin-top: 16px;">Loading reports...</p>
+                </div>
+            </div>
+            <div class="report-sidebar" id="reportSidebar">
+                <div class="sidebar-header"><i class="fas fa-info-circle"></i> Report details</div>
+                <div class="sidebar-content" id="sidebarDynamicContent">
+                    <div class="empty-sidebar">
+                        <i class="fas fa-file-alt fa-2x" style="opacity:0.5;"></i>
+                        <p style="margin-top:12px;">Select any report to view full details, preview, and download options.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="footer-note"><i class="fas fa-chart-pie"></i> Click on any report card → see detailed insights on the right. Download buttons available on both card & sidebar.</div>
+    </div>
+</div>
+
+<script>
+    // Full reports dataset
+    const fullReportsLibrary = [
+        { id: 1, title: "Q1 Pricing Outlook", type: "PDF", size: "4.2 MB", date: "Mar 12, 2025", description: "Forecast for technology roles and rate trends in Q1. Includes regional variations and AI impact.", icon: "fa-file-pdf", fileName: "Q1_Pricing_Outlook.pdf", contentPreview: "The outlook shows +5% YoY growth for senior DevOps roles. Cloud architects remain high demand with rate premium 12-18%. Detailed tables inside with quarterly projections and market share analysis." },
+        { id: 2, title: "Regional Benchmarks", type: "XLSX", size: "12.8 MB", date: "Feb 28, 2025", description: "Hourly rates comparison: US, EU, APAC regions. Detailed breakdown by seniority and skill set.", icon: "fa-file-excel", fileName: "Regional_Benchmarks.xlsx", contentPreview: "Interactive spreadsheet: US average $142/hr, EU $118/hr, APAC $89/hr. Multiple sheets with percentile data, year-over-year trends, and customizable filters." },
+        { id: 3, title: "AI Talent Scarcity", type: "PDF", size: "2.1 MB", date: "Mar 01, 2025", description: "Impact of GenAI on senior engineering rates and retention risks across tech sectors.", icon: "fa-file-pdf", fileName: "AI_Talent_Scarcity.pdf", contentPreview: "Key findings: 34% of firms report severe talent shortage. Rates for ML engineers increased 22% YoY. Strategic recommendations included." },
+        { id: 4, title: "H2 Margin Analysis", type: "PPTX", size: "6.3 MB", date: "Feb 10, 2025", description: "Margin performance & optimization playbook with Q3 forecast and action items.", icon: "fa-file-powerpoint", fileName: "H2_Margin_Analysis.pptx", contentPreview: "Slides: margin levers (18 pages), client negotiation tactics, pricing scenarios. Improvement opportunities worth +3.2% margin." },
+        { id: 5, title: "Quarterly Risk Dashboard", type: "PDF", size: "3.4 MB", date: "Jan 22, 2025", description: "High-risk alerts & mitigation strategies for volatile roles and markets.", icon: "fa-file-pdf", fileName: "Risk_Dashboard_Q1.pdf", contentPreview: "Top risks: cybersecurity roles (+28% volatility), AI compliance requirements, and counteroffer spikes (+15% YoY)." },
+        { id: 6, title: "Salary & Rate Index", type: "XLSX", size: "9.1 MB", date: "Mar 05, 2025", description: "Benchmark indices for DevOps, Data, Security across 15 major metros.", icon: "fa-file-excel", fileName: "Salary_Rate_Index.xlsx", contentPreview: "Filterable index covering 25th/75th percentiles, year-over-year trends by geography. Updated with Q1 2025 data points." },
+        { id: 7, title: "Tech Talent Scarcity Report", type: "PDF", size: "5.0 MB", date: "Feb 18, 2025", description: "Deep dive into AI/ML talent premiums and hiring difficulty metrics.", icon: "fa-file-pdf", fileName: "Tech_Talent_Scarcity_2025.pdf", contentPreview: "Survey of 200+ enterprise companies. 78% report longer time-to-hire for senior AI roles. Premiums up to 27% above market." },
+        { id: 8, title: "Executive Summary Q4", type: "PPTX", size: "8.2 MB", date: "Jan 05, 2025", description: "Strategic pricing recommendations for leadership with ROI projections.", icon: "fa-file-powerpoint", fileName: "Executive_Summary_Q4.pptx", contentPreview: "Board-ready slides: rate adjustments by region, margin protection strategies, and 2025 strategic roadmap." },
+        { id: 9, title: "Global Workforce Trends", type: "PDF", size: "4.8 MB", date: "Mar 10, 2025", description: "Remote work impact on rates, distributed teams analysis, and future outlook.", icon: "fa-file-pdf", fileName: "Global_Workforce_Trends.pdf", contentPreview: "Remote premiums have stabilized at +8-12%. Nearshore growth +19% YoY. Future outlook suggests continued hybrid demand." },
+        { id: 10, title: "Automation Impact Study", type: "XLSX", size: "11.3 MB", date: "Feb 14, 2025", description: "Efficiency metrics and rate correlation with automation adoption.", icon: "fa-file-excel", fileName: "Automation_Impact_Study.xlsx", contentPreview: "Productivity gains by role (15-40%), automation cost savings analysis, and rate elasticity model." },
+        { id: 11, title: "Rate Card Library 2025", type: "PDF", size: "7.0 MB", date: "Jan 30, 2025", description: "Standardized role-based pricing matrix for 50+ roles across all levels.", icon: "fa-file-pdf", fileName: "Rate_Card_Library_2025.pdf", contentPreview: "Official rate guidelines covering 50+ technical roles. Includes markup recommendations (15-35%) and regional multipliers." },
+        { id: 12, title: "Margin Simulator Outputs", type: "XLSX", size: "3.9 MB", date: "Mar 07, 2025", description: "Interactive margin model results and scenario planning tools.", icon: "fa-file-excel", fileName: "Margin_Simulator_Outputs.xlsx", contentPreview: "What-if analysis dashboard: rate changes (+/-10%), cost fluctuations, volume discount impact. 20+ pre-built models." }
+    ];
+    
+    const recentReportsShort = [
+        { name: "Q1 Pricing Outlook", type: "PDF", size: "4.2 MB" },
+        { name: "Regional Benchmarks", type: "XLSX", size: "12.8 MB" },
+        { name: "AI Talent Scarcity", type: "PDF", size: "2.1 MB" },
+        { name: "H2 Margin Analysis", type: "PPTX", size: "6.3 MB" }
+    ];
+
+    // Download simulation
+    function downloadReport(report) {
+        const content = `=== ${report.title} ===\nFormat: ${report.type}\nDate: ${report.date}\nSize: ${report.size}\n\n--- PREVIEW ---\n${report.contentPreview}\n\n--- FULL REPORT ---\nThis is a simulated download of "${report.title}".\nTechgene Pricing Intelligence v2.5`;
+        const blob = new Blob([content], { type: "text/plain" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = report.fileName || `${report.title.replace(/\s/g, '_')}.txt`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast(`Downloaded: ${report.title}`, "success");
+    }
+
+    function showToast(msg, type) {
+        let container = document.getElementById('dynamic-toast');
+        if (!container) {
+            container = document.createElement('div');
+            container.id = 'dynamic-toast';
+            container.style.cssText = 'position:fixed; bottom:24px; right:24px; z-index:9999; display:flex; flex-direction:column; gap:10px;';
+            document.body.appendChild(container);
+        }
+        const toast = document.createElement('div');
+        toast.style.cssText = `background: ${type === 'success' ? '#1f7b4d' : '#2c6280'}; color: white; padding: 10px 18px; border-radius: 40px; font-size: 0.8rem; font-weight: 500; box-shadow: 0 4px 12px rgba(0,0,0,0.15);`;
+        toast.innerText = msg;
+        container.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.2s'; setTimeout(() => toast.remove(), 200); }, 2600);
+    }
+
+    // Show report details in sidebar
+    function showReportDetails(report) {
+        const sidebarContent = document.getElementById('sidebarDynamicContent');
+        if (!sidebarContent) return;
+        sidebarContent.innerHTML = `
+            <div class="detail-field"><div class="detail-label">REPORT TITLE</div><div class="detail-value">${escapeHtml(report.title)}</div></div>
+            <div class="detail-field"><div class="detail-label">PUBLISHED</div><div class="detail-value">${escapeHtml(report.date)}</div></div>
+            <div class="detail-field"><div class="detail-label">FORMAT & SIZE</div><div class="detail-value">${escapeHtml(report.type)} • ${escapeHtml(report.size)}</div></div>
+            <div class="detail-field"><div class="detail-label">DESCRIPTION</div><div class="detail-value">${escapeHtml(report.description)}</div></div>
+            <div class="detail-field"><div class="detail-label">PREVIEW / KEY INSIGHTS</div><div class="preview-text"><i class="fas fa-quote-left" style="margin-right:6px; opacity:0.7;"></i> ${escapeHtml(report.contentPreview)}</div></div>
+            <button id="sidebarDownloadBtn" class="sidebar-download"><i class="fas fa-download"></i> Download full report (${escapeHtml(report.type)})</button>
+        `;
+        const sidebarBtn = document.getElementById('sidebarDownloadBtn');
+        if (sidebarBtn) {
+            sidebarBtn.addEventListener('click', () => downloadReport(report));
+        }
+    }
+
+    function escapeHtml(str) {
+        return str.replace(/[&<>]/g, function(m) {
+            if (m === '&') return '&amp;';
+            if (m === '<') return '&lt;';
+            if (m === '>') return '&gt;';
+            return m;
+        }).replace(/[\uD800-\uDBFF][\uDC00-\uDFFF]/g, function(c) {
+            return c;
+        });
+    }
+
+    // Render full reports grid (the main reports library view)
+    let reportsRendered = false;
+    function renderFullReports() {
+        const grid = document.getElementById('reportsGridContainer');
+        if (!grid) return;
+        
+        grid.innerHTML = fullReportsLibrary.map(report => `
+            <div class="report-card" data-report-id="${report.id}">
+                <div class="card-header">
+                    <div class="file-type"><i class="fas ${report.icon}"></i></div>
+                    <div class="badge-date">${escapeHtml(report.date)}</div>
+                </div>
+                <div class="report-title">${escapeHtml(report.title)}</div>
+                <div class="report-desc">${escapeHtml(report.description.substring(0, 85))}${report.description.length > 85 ? '…' : ''}</div>
+                <div class="report-meta-row">
+                    <span><i class="far fa-file"></i> ${escapeHtml(report.type)}</span>
+                    <span><i class="fas fa-database"></i> ${escapeHtml(report.size)}</span>
+                </div>
+                <button class="download-btn-card" data-id="${report.id}"><i class="fas fa-download"></i> Download</button>
+            </div>
+        `).join('');
+        
+        // Card click -> show details (but not when clicking download button)
+        document.querySelectorAll('.report-card').forEach(card => {
+            card.addEventListener('click', (e) => {
+                if (e.target.classList.contains('download-btn-card') || e.target.closest('.download-btn-card')) return;
+                const id = parseInt(card.getAttribute('data-report-id'));
+                const report = fullReportsLibrary.find(r => r.id === id);
+                if (report) showReportDetails(report);
+            });
+        });
+        
+        // Download button on card
+        document.querySelectorAll('.download-btn-card').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const id = parseInt(btn.getAttribute('data-id'));
+                const report = fullReportsLibrary.find(r => r.id === id);
+                if (report) downloadReport(report);
+            });
+        });
+        
+        // Auto-select first report for better UX (only if sidebar is empty/default)
+        const sidebarContent = document.getElementById('sidebarDynamicContent');
+        if (sidebarContent && sidebarContent.querySelector('.empty-sidebar')) {
+            if (fullReportsLibrary.length > 0) showReportDetails(fullReportsLibrary[0]);
+        }
+        reportsRendered = true;
+    }
+
+    // Dashboard pending approvals
+    let pendingData = [
+        { id: "#RQ-8821", client: "Astra Financial", role: "Snr DevOps Engineer", rate: "$145.00/hr", confidence: "94%" },
+        { id: "#RQ-8834", client: "Astra Financial", role: "Cloud Architect", rate: "$168.00/hr", confidence: "91%" },
+        { id: "#RQ-8842", client: "NexGen Solutions", role: "Lead Data Engineer", rate: "$132.00/hr", confidence: "96%" },
+        { id: "#RQ-8850", client: "Meridian Bank", role: "Security Specialist", rate: "$158.00/hr", confidence: "88%" }
+    ];
+    
+    function renderPendingTable() {
+        const tbody = document.getElementById('pendingTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+        pendingData.forEach(item => {
+            const row = tbody.insertRow();
+            row.insertCell(0).innerHTML = `<span style="font-weight:600;">${escapeHtml(item.id)}</span>`;
+            row.insertCell(1).innerHTML = `<div><strong>${escapeHtml(item.client)}</strong></div><div style="font-size:0.7rem; color:#6883a0;">${escapeHtml(item.role)}</div>`;
+            row.insertCell(2).innerHTML = `<strong>${escapeHtml(item.rate)}</strong>`;
+            row.insertCell(3).innerHTML = `<span class="confidence-badge"><i class="fas fa-microchip"></i> ${escapeHtml(item.confidence)}</span>`;
+            row.insertCell(4).innerHTML = `<button class="btn-approve" data-id="${item.id}">Approve</button> <button class="btn-reject" data-id="${item.id}">Reject</button>`;
+        });
+        document.querySelectorAll('.btn-approve').forEach(btn => btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            pendingData = pendingData.filter(i => i.id !== id);
+            renderPendingTable();
+            showToast(`Request ${id} approved`, 'success');
+        }));
+        document.querySelectorAll('.btn-reject').forEach(btn => btn.addEventListener('click', (e) => {
+            const id = btn.getAttribute('data-id');
+            pendingData = pendingData.filter(i => i.id !== id);
+            renderPendingTable();
+            showToast(`Request ${id} rejected`, 'info');
+        }));
+        const badgeSpan = document.getElementById('pendingCountBadge');
+        if (badgeSpan) badgeSpan.innerText = `${pendingData.length} request${pendingData.length !== 1 ? 's' : ''}`;
+    }
+    
+    function renderRecentReports() {
+        const container = document.getElementById('recentReportsList');
+        if (!container) return;
+        container.innerHTML = recentReportsShort.map(r => `
+            <div class="report-item" data-title="${escapeHtml(r.name)}">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <i class="fas ${r.type === 'PDF' ? 'fa-file-pdf' : (r.type === 'XLSX' ? 'fa-file-excel' : 'fa-file-powerpoint')}" style="font-size:1.3rem; color:#557da5;"></i>
+                    <div><strong>${escapeHtml(r.name)}</strong><div style="font-size:0.7rem; color:#8899b0;">${escapeHtml(r.type)} • ${escapeHtml(r.size)}</div></div>
+                </div>
+                <i class="fas fa-download download-icon" data-name="${escapeHtml(r.name)}" style="cursor:pointer; color:#7d94af;"></i>
+            </div>
+        `).join('');
+        
+        document.querySelectorAll('.report-item').forEach(el => {
+            el.addEventListener('click', (e) => {
+                if (e.target.classList.contains('download-icon')) return;
+                const title = el.getAttribute('data-title');
+                const report = fullReportsLibrary.find(r => r.title === title);
+                if (report) {
+                    setActiveTab('reports');
+                    setTimeout(() => {
+                        showReportDetails(report);
+                        // scroll to the selected card? optional but nice
+                        const card = document.querySelector(`.report-card[data-report-id="${report.id}"]`);
+                        if (card) card.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 100);
+                }
+            });
+        });
+        
+        document.querySelectorAll('.download-icon').forEach(icon => {
+            icon.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const name = icon.getAttribute('data-name');
+                const report = fullReportsLibrary.find(r => r.title === name);
+                if (report) downloadReport(report);
+            });
+        });
+    }
+    
+    // Tab switching FIXED: ensures reports page shows content correctly
+    const dashboardView = document.getElementById('dashboardView');
+    const reportsPage = document.getElementById('reportsFullPage');
+    const dashboardBtn = document.getElementById('dashboardTabBtn');
+    const reportsBtn = document.getElementById('reportsTabBtn');
+    
+    function setActiveTab(tab) {
+        if (tab === 'dashboard') {
+            dashboardView.classList.remove('hidden');
+            reportsPage.classList.remove('visible');
+            dashboardBtn.classList.add('active');
+            reportsBtn.classList.remove('active');
+        } else {
+            dashboardView.classList.add('hidden');
+            reportsPage.classList.add('visible');
+            dashboardBtn.classList.remove('active');
+            reportsBtn.classList.add('active');
+            // CRITICAL: ensure reports grid is rendered when switching to reports tab
+            if (!reportsRendered) {
+                renderFullReports();
+            } else {
+                // If grid is empty or still shows loading, re-render safely
+                const gridContainer = document.getElementById('reportsGridContainer');
+                if (gridContainer && gridContainer.innerHTML.includes('Loading') || gridContainer.children.length === 0) {
+                    renderFullReports();
+                }
+            }
+        }
+    }
+    
+    // Initialize everything
+    renderPendingTable();
+    renderRecentReports();
+    // Pre-render reports library but keep hidden until tab click
+    renderFullReports();
+    // Ensure that the page starts with dashboard visible, reports hidden but fully populated
+    setActiveTab('dashboard');
+    
+    // Attach tab event listeners
+    dashboardBtn.addEventListener('click', () => setActiveTab('dashboard'));
+    reportsBtn.addEventListener('click', () => setActiveTab('reports'));
+</script>
+</body>
+</html>
